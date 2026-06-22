@@ -1,0 +1,98 @@
+//-----------------------------------------------------//
+// STAR-DELTA MOTOR STARTER CONTROL
+// Siemens S7 PLC - STL/AWL Format
+// STEP 7 Classic (SIMATIC Manager)
+// Author: dedamanre123
+// Date: 2026-06-22
+//-----------------------------------------------------//
+//PHASE 1// START/STOP PROCESS
+//-----------------------------------------------------//
+//START PROCESS
+      A     "START"
+      A     "STOP"
+      A     "OVERLOAD_RELAY"
+      AN    "FAULT_ALARM"
+      S     "PROCESS"
+//STOP PROCESS
+      O(    
+      AN    "STOP"
+      )     
+      O(    
+      AN    "OVERLOAD_RELAY"
+      )     
+      O     "FAULT_ALARM"
+      R     "PROCESS"
+//-----------------------------------------------------//
+//PHASE 2// MAIN CONTACTOR CONTROL
+//-----------------------------------------------------//
+      A     "PROCESS"
+      =     "MAIN_CONTACTOR"
+//-----------------------------------------------------//
+//PHASE 3//TIMER SEQUENCE
+//-----------------------------------------------------//
+// STAR DELTA TIMER
+      A     "PROCESS"
+      L     S5T#5S
+      SD    T      1
+//DEAD TIME TIMER
+      A     T      1
+      L     S5T#300MS
+      SD    T      2
+//-----------------------------------------------------//
+//PHASE 4// STAR CONTACTOR CONTROL
+//-----------------------------------------------------//
+// SET STAR_CONTACTOR FOR 5S
+      A     "PROCESS"
+      AN    T      1
+      AN    "DELTA_CONTACTOR"
+      =     "STAR_CONTACTOR"
+//-----------------------------------------------------//
+//PHASE 5 // DELTA CONTACTOR CONTROL
+//-----------------------------------------------------//
+//SWITCH TO DELTA CONTACTOR AFTER 300MS DELAY
+      A     "PROCESS"
+      A     T      1
+      A     T      2
+      AN    "STAR_CONTACTOR"
+      =     "DELTA_CONTACTOR"
+//-----------------------------------------------------//
+// PHASE 6 FAULT HANDLING
+//-----------------------------------------------------//
+//MAIN CONTACTOR FEEDBACK
+      A     "PROCESS"
+      A     "MAIN_CONTACTOR"
+      AN    "MAIN_FEEDBACK"
+      L     S5T#5S
+      SD    T      3
+//STAR CONTACTOR FEEDBACK
+      A     "PROCESS"
+      A     "STAR_CONTACTOR"
+      AN    "STAR_FEEDBACK"
+      L     S5T#5S
+      SD    T      4
+//DELTA CONTACTOR FEEDBACK
+      A     "PROCESS"
+      A     "DELTA_CONTACTOR"
+      AN    "DELTA_FEEDBACK"
+      L     S5T#5S
+      SD    T      5
+//SET FAULT ALARM
+      A     T      3
+      O     T      4
+      O     T      5
+      S     "FAULT_ALARM"
+// RESET FAULT ALARM
+      A     "FAULT_ALARM_RESET"
+      R     "FAULT_ALARM"
+
+
+
+
+
+
+
+
+
+
+
+
